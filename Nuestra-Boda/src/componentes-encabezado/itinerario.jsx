@@ -1,371 +1,179 @@
+
 import React from "react";
 import { motion } from "framer-motion";
 import {
-  CakeSlice,
-  Camera,
+  Church,
+  PartyPopper,
   Crown,
-  GlassWater,
-  Heart,
-  Music2,
   Sparkles,
-  UtensilsCrossed,
+  Heart,
+  Clock3,
 } from "lucide-react";
 
-const Itinerario = () => {
-  const eventos = [
-    {
-      hora: "4:30 PM",
-      titulo: "Recepción",
-      descripcion:
-        "Daremos la bienvenida a todos nuestros invitados.",
-      icono: Crown,
-    },
-    {
-      hora: "5:00 PM",
-      titulo: "Entrada de la quinceañera",
-      descripcion:
-        "El momento especial en el que dará inicio la celebración.",
-      icono: Sparkles,
-    },
-    {
-      hora: "5:30 PM",
-      titulo: "Vals",
-      descripcion:
-        "Una tradición llena de emoción y recuerdos inolvidables.",
-      icono: Heart,
-    },
-    {
-      hora: "6:00 PM",
-      titulo: "Cena",
-      descripcion:
-        "Compartiremos una deliciosa cena en compañía de todos.",
-      icono: UtensilsCrossed,
-    },
-    {
-      hora: "7:00 PM",
-      titulo: "Brindis",
-      descripcion:
-        "Levantaremos nuestras copas para celebrar esta nueva etapa.",
-      icono: GlassWater,
-    },
-    {
-      hora: "7:30 PM",
-      titulo: "Pastel",
-      descripcion:
-        "Disfrutaremos juntos de uno de los momentos más dulces.",
-      icono: CakeSlice,
-    },
-    {
-      hora: "8:00 PM",
-      titulo: "Sesión de fotografías",
-      descripcion:
-        "Un momento para guardar recuerdos junto a familiares y amigos.",
-      icono: Camera,
-    },
-    {
-      hora: "8:30 PM",
-      titulo: "Baile",
-      descripcion:
-        "La pista estará lista para disfrutar y celebrar toda la noche.",
-      icono: Music2,
-    },
-  ];
+const eventos = [
+  {
+    hora: "5:00 PM",
+    titulo: "Misa",
+    descripcion:
+      "Acompáñame a dar gracias a Dios por estos quince años de vida.",
+    icono: Church,
+  },
+  {
+    hora: "7:00 PM",
+    titulo: "Recepción",
+    descripcion:
+      "Celebremos juntos una noche llena de alegría y momentos inolvidables.",
+    icono: PartyPopper,
+  },
+];
 
+export default function Itinerario() {
   return (
     <section
+      id="itinerario"
       className="
-        itinerarioXV
-        relative
-        isolate
-        w-full
-        overflow-hidden
-        bg-gradient-to-b
-        from-[#E8DFF2]
-        via-[#FFFFFF]
-        to-[#F5EBDD]
-        px-5
-        py-20
-        sm:px-8
-        sm:py-28
+        relative isolate
+        w-full overflow-hidden
+        bg-[#EDE0CC]
+        px-4 py-20
+        sm:px-8 sm:py-28
       "
     >
-      {/* LUCES DECORATIVAS */}
-      <div
-        className="
-          itinerarioXV__luz-superior
-          pointer-events-none
-          absolute
-          -left-32
-          -top-32
-          h-[420px]
-          w-[420px]
-          rounded-full
-          bg-[#C8B6E2]/45
-          blur-[110px]
-        "
-      />
+      {/* MARCOS DECORATIVOS */}
+      <div className="
+        pointer-events-none absolute inset-3
+        border border-[#B99558]/35
+        sm:inset-6
+      " />
 
-      <div
-        className="
-          itinerarioXV__luz-inferior
-          pointer-events-none
-          absolute
-          -bottom-36
-          -right-28
-          h-[440px]
-          w-[440px]
-          rounded-full
-          bg-[#5D4E8C]/18
-          blur-[120px]
-        "
-      />
+      <div className="
+        pointer-events-none absolute inset-[18px]
+        border border-[#B99558]/20
+        sm:inset-[30px]
+      " />
 
       {/* DESTELLOS */}
       <motion.div
         className="
-          itinerarioXV__destello-izquierdo
-          pointer-events-none
-          absolute
-          left-[7%]
-          top-24
-          text-[#5D4E8C]/45
+          pointer-events-none absolute
+          left-[7%] top-14 text-[#B58A49]
         "
         animate={{
-          opacity: [0.25, 1, 0.25],
-          scale: [0.8, 1.2, 0.8],
+          opacity: [0.3, 1, 0.3],
           rotate: [0, 20, 0],
         }}
         transition={{
-          duration: 3.3,
+          duration: 4,
           repeat: Infinity,
-          ease: "easeInOut",
+        }}
+      >
+        <Sparkles size={28} strokeWidth={1.2} />
+      </motion.div>
+
+      <motion.div
+        className="
+          pointer-events-none absolute
+          right-[8%] bottom-20 text-[#B58A49]
+        "
+        animate={{
+          opacity: [0.3, 0.9, 0.3],
+          rotate: [0, -20, 0],
+        }}
+        transition={{
+          duration: 4.5,
+          repeat: Infinity,
         }}
       >
         <Sparkles size={30} strokeWidth={1.2} />
       </motion.div>
 
-      <motion.div
-        className="
-          itinerarioXV__destello-derecho
-          pointer-events-none
-          absolute
-          bottom-24
-          right-[8%]
-          text-[#C8B6E2]
-        "
-        animate={{
-          opacity: [0.2, 0.9, 0.2],
-          scale: [0.7, 1.15, 0.7],
-          rotate: [0, -20, 0],
-        }}
-        transition={{
-          duration: 4,
-          repeat: Infinity,
-          ease: "easeInOut",
-          delay: 0.5,
-        }}
-      >
-        <Sparkles size={38} strokeWidth={1.1} />
-      </motion.div>
+      <div className="relative z-10 mx-auto max-w-5xl">
 
-      <div
-        className="
-          itinerarioXV__contenedor
-          relative
-          z-10
-          mx-auto
-          max-w-6xl
-        "
-      >
         {/* ENCABEZADO */}
         <motion.div
-          className="
-            itinerarioXV__encabezado
-            mx-auto
-            mb-16
-            max-w-3xl
-            text-center
-          "
-          initial={{
-            opacity: 0,
-            y: 35,
-          }}
-          whileInView={{
-            opacity: 1,
-            y: 0,
-          }}
-          transition={{
-            duration: 0.9,
-            ease: "easeOut",
-          }}
-          viewport={{
-            once: true,
-            amount: 0.3,
-          }}
+          className="mx-auto mb-16 text-center"
+          initial={{ opacity: 0, y: 35 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
         >
           <motion.div
             className="
-              itinerarioXV__corona
-              mx-auto
-              mb-5
-              flex
-              h-16
-              w-16
-              items-center
-              justify-center
+              mx-auto mb-6 flex h-20 w-20
+              items-center justify-center
               rounded-full
-              border
-              border-[#5D4E8C]/15
-              bg-white/75
-              text-[#5D4E8C]
-              shadow-[0_12px_30px_rgba(93,78,140,0.15)]
-              backdrop-blur-md
+              border border-[#C7A46A]
+              bg-[#F8F3EA]
+              text-[#A47B3C]
             "
-            animate={{
-              y: [0, -5, 0],
-              rotate: [0, 2, 0, -2, 0],
-            }}
+            animate={{ y: [0, -5, 0] }}
             transition={{
               duration: 4,
               repeat: Infinity,
               ease: "easeInOut",
             }}
           >
-            <Crown size={30} strokeWidth={1.35} />
+            <Crown size={37} strokeWidth={1.2} />
           </motion.div>
 
-          <p
-            className="
-              itinerarioXV__etiqueta
-              font-playfair
-              text-xs
-              font-semibold
-              uppercase
-              tracking-[0.4em]
-              text-[#5D4E8C]/65
-              sm:text-sm
-            "
-          >
-            Una noche inolvidable
-          </p>
 
           <h2
             className="
-              itinerarioXV__titulo
-              mt-4
-              font-cursiveDancing
-              text-5xl
-              leading-none
-              text-[#5D4E8C]
-              sm:text-6xl
-              md:text-7xl
+              mt-4 text-[65px] leading-tight
+              text-[#A47B3C] sm:text-[85px]
             "
+            style={{
+              fontFamily: "'Great Vibes', cursive",
+            }}
           >
             Itinerario
           </h2>
 
-          <div
-            className="
-              itinerarioXV__separador
-              mx-auto
-              my-8
-              flex
-              items-center
-              justify-center
-              gap-3
-            "
-          >
-            <span
-              className="
-                h-px
-                w-16
-                bg-gradient-to-r
-                from-transparent
-                to-[#5D4E8C]/40
-                sm:w-24
-              "
+          <div className="
+            mx-auto my-6 flex items-center
+            justify-center gap-3
+          ">
+            <span className="h-px w-16 bg-[#B99558]" />
+
+            <Heart
+              size={17}
+              fill="#B99558"
+              className="text-[#B99558]"
             />
 
-            <Sparkles
-              size={19}
-              strokeWidth={1.3}
-              className="text-[#5D4E8C]"
-            />
-
-            <span
-              className="
-                h-px
-                w-16
-                bg-gradient-to-l
-                from-transparent
-                to-[#5D4E8C]/40
-                sm:w-24
-              "
-            />
+            <span className="h-px w-16 bg-[#B99558]" />
           </div>
 
-          <p
-            className="
-              itinerarioXV__descripcion
-              mx-auto
-              max-w-2xl
-              font-playfair
-              text-base
-              leading-8
-              text-[#2E2E2E]/70
-              sm:text-lg
-            "
-          >
-            Estos serán algunos de los momentos especiales que
-            viviremos durante la celebración.
-          </p>
         </motion.div>
 
         {/* LÍNEA DEL TIEMPO */}
-        <div
-          className="
-            itinerarioXV__timeline
-            relative
-            mx-auto
-            max-w-5xl
-          "
-        >
-          {/* LÍNEA CENTRAL EN ESCRITORIO */}
+        <div className="relative mx-auto max-w-4xl">
+
+          {/* LÍNEA VERTICAL */}
           <div
             className="
-              itinerarioXV__linea-central
-              absolute
-              left-6
-              top-0
-              h-full
-              w-px
-              bg-gradient-to-b
-              from-transparent
-              via-[#5D4E8C]/35
-              to-transparent
+              absolute bottom-10 left-6 top-10
+              w-px bg-[#B99558]/60
               md:left-1/2
               md:-translate-x-1/2
             "
           />
 
-          <div className="itinerarioXV__eventos space-y-10 md:space-y-14">
+          <div className="space-y-12 md:space-y-16">
             {eventos.map((evento, index) => {
               const Icono = evento.icono;
-              const esIzquierda = index % 2 === 0;
+              const izquierda = index % 2 === 0;
 
               return (
                 <motion.div
-                  key={`${evento.hora}-${evento.titulo}`}
-                  className={`
-                    itinerarioXV__evento
-                    relative
-                    grid
-                    grid-cols-[48px_1fr]
-                    items-center
-                    gap-5
-                    md:grid-cols-[1fr_80px_1fr]
-                    md:gap-8
-                  `}
+                  key={evento.titulo}
+                  className="
+                    relative grid
+                    grid-cols-[48px_minmax(0,1fr)]
+                    items-center gap-4
+                    md:grid-cols-[minmax(0,1fr)_72px_minmax(0,1fr)]
+                    md:gap-5
+                  "
                   initial={{
                     opacity: 0,
                     y: 35,
@@ -374,267 +182,161 @@ const Itinerario = () => {
                     opacity: 1,
                     y: 0,
                   }}
-                  transition={{
-                    duration: 0.7,
-                    delay: index * 0.06,
-                    ease: "easeOut",
-                  }}
                   viewport={{
                     once: true,
-                    amount: 0.25,
+                    amount: 0.2,
+                  }}
+                  transition={{
+                    duration: 0.7,
+                    delay: index * 0.15,
                   }}
                 >
-                  {/* TARJETA IZQUIERDA EN ESCRITORIO */}
-                  <div
-                    className={`
-                      itinerarioXV__lado-izquierdo
-                      hidden
-                      md:block
-                      ${
-                        esIzquierda
-                          ? "md:col-start-1"
-                          : "md:col-start-3"
-                      }
-                    `}
-                  >
-                    <motion.div
-                      className={`
-                        itinerarioXV__tarjeta
-                        relative
-                        overflow-hidden
-                        rounded-[2rem]
-                        border
-                        border-white/80
-                        bg-white/75
-                        px-7
-                        py-7
-                        shadow-[0_18px_50px_rgba(93,78,140,0.14)]
-                        backdrop-blur-xl
-                        ${
-                          esIzquierda
-                            ? "text-right"
-                            : "text-left"
-                        }
-                      `}
-                      whileHover={{
-                        y: -5,
-                        scale: 1.015,
-                      }}
-                      transition={{
-                        duration: 0.3,
-                      }}
-                    >
-                      <div
-                        className="
-                          itinerarioXV__tarjeta-brillo
-                          pointer-events-none
-                          absolute
-                          -right-12
-                          -top-12
-                          h-32
-                          w-32
-                          rounded-full
-                          bg-[#C8B6E2]/30
-                          blur-2xl
-                        "
-                      />
-
-                      <p
-                        className="
-                          itinerarioXV__hora
-                          relative
-                          font-playfair
-                          text-sm
-                          font-semibold
-                          uppercase
-                          tracking-[0.2em]
-                          text-[#5D4E8C]/65
-                        "
-                      >
-                        {evento.hora}
-                      </p>
-
-                      <h3
-                        className="
-                          itinerarioXV__evento-titulo
-                          relative
-                          mt-3
-                          font-cursiveDancing
-                          text-4xl
-                          text-[#5D4E8C]
-                        "
-                      >
-                        {evento.titulo}
-                      </h3>
-
-                      <p
-                        className="
-                          itinerarioXV__evento-descripcion
-                          relative
-                          mt-4
-                          font-playfair
-                          text-base
-                          leading-7
-                          text-[#2E2E2E]/65
-                        "
-                      >
-                        {evento.descripcion}
-                      </p>
-                    </motion.div>
-                  </div>
-
                   {/* ICONO CENTRAL */}
-                  <motion.div
+                  <div
                     className="
-                      itinerarioXV__icono-central
-                      relative
-                      z-10
-                      col-start-1
-                      row-start-1
-                      flex
-                      h-12
-                      w-12
-                      items-center
-                      justify-center
+                      relative z-10
+                      col-start-1 row-start-1
+                      flex h-12 w-12
+                      items-center justify-center
                       rounded-full
-                      border-4
-                      border-[#F5EBDD]
-                      bg-[#5D4E8C]
+                      border-[3px] border-[#F8F3EA]
+                      bg-[#A47B3C]
                       text-white
-                      shadow-[0_10px_30px_rgba(93,78,140,0.3)]
+                      shadow-[0_6px_20px_rgba(100,75,35,0.2)]
                       md:col-start-2
-                      md:h-16
-                      md:w-16
+                      md:mx-auto
+                      md:h-16 md:w-16
                     "
-                    whileHover={{
-                      scale: 1.12,
-                      rotate: 5,
-                    }}
-                    transition={{
-                      duration: 0.3,
-                    }}
                   >
                     <Icono
-                      size={22}
+                      size={23}
                       strokeWidth={1.5}
                       className="md:h-7 md:w-7"
                     />
+                  </div>
 
-                    <motion.span
-                      className="
-                        itinerarioXV__icono-pulso
-                        absolute
-                        inset-0
-                        rounded-full
-                        border
-                        border-[#5D4E8C]
-                      "
-                      animate={{
-                        scale: [1, 1.45],
-                        opacity: [0.45, 0],
-                      }}
-                      transition={{
-                        duration: 2.2,
-                        repeat: Infinity,
-                        ease: "easeOut",
-                        delay: index * 0.15,
-                      }}
-                    />
-                  </motion.div>
-
-                  {/* TARJETA MÓVIL */}
-                  <motion.div
-                    className="
-                      itinerarioXV__tarjeta-movil
-                      relative
-                      col-start-2
-                      row-start-1
-                      overflow-hidden
-                      rounded-[1.7rem]
-                      border
-                      border-white/80
-                      bg-white/80
-                      px-5
-                      py-6
-                      shadow-[0_16px_40px_rgba(93,78,140,0.12)]
-                      backdrop-blur-xl
-                      md:hidden
-                    "
+                  {/* TARJETA */}
+                  <motion.article
+                    className={`
+                      relative min-w-0
+                      col-start-2 row-start-1
+                      border border-[#C7A46A]
+                      bg-[#FFFDF9]
+                      px-4 py-7
+                      shadow-[0_12px_35px_rgba(100,75,35,0.1)]
+                      sm:px-7 sm:py-9
+                      ${
+                        izquierda
+                          ? "md:col-start-1 md:text-right"
+                          : "md:col-start-3 md:text-left"
+                      }
+                    `}
                     whileHover={{
                       y: -4,
                     }}
+                    transition={{ duration: 0.3 }}
                   >
+                    {/* MARCO INTERIOR */}
                     <div
                       className="
-                        itinerarioXV__tarjeta-movil-brillo
                         pointer-events-none
-                        absolute
-                        -right-10
-                        -top-10
-                        h-28
-                        w-28
-                        rounded-full
-                        bg-[#C8B6E2]/35
-                        blur-2xl
+                        absolute inset-[6px]
+                        border border-[#C7A46A]/25
                       "
                     />
 
-                    <p
-                      className="
-                        itinerarioXV__hora-movil
-                        relative
-                        font-playfair
-                        text-xs
-                        font-semibold
-                        uppercase
-                        tracking-[0.2em]
-                        text-[#5D4E8C]/65
-                      "
+                    {/* HORA */}
+                    <div
+                      className={`
+                        relative flex items-center gap-2
+                        text-[#A47B3C]
+                        ${
+                          izquierda
+                            ? "md:justify-end"
+                            : "md:justify-start"
+                        }
+                      `}
                     >
-                      {evento.hora}
-                    </p>
+                      <Clock3 size={18} strokeWidth={1.5} />
 
+                      <span
+                        className="
+                          text-sm font-semibold
+                          uppercase tracking-[0.12em]
+                        "
+                        style={{
+                          fontFamily:
+                            "'Playfair Display', serif",
+                        }}
+                      >
+                        {evento.hora}
+                      </span>
+                    </div>
+
+                    {/* TÍTULO */}
                     <h3
                       className="
-                        itinerarioXV__titulo-movil
-                        relative
-                        mt-2
-                        font-cursiveDancing
-                        text-3xl
-                        text-[#5D4E8C]
+                        relative mt-4
+                        text-[43px] leading-tight
+                        text-[#A47B3C]
+                        sm:text-[53px]
                       "
+                      style={{
+                        fontFamily: "'Great Vibes', cursive",
+                      }}
                     >
                       {evento.titulo}
                     </h3>
 
+                    {/* SEPARADOR */}
+                    <div
+                      className={`
+                        relative my-4 flex items-center gap-2
+                        ${
+                          izquierda
+                            ? "md:justify-end"
+                            : "md:justify-start"
+                        }
+                      `}
+                    >
+                      <span className="h-px w-12 bg-[#C7A46A]" />
+                      <Sparkles
+                        size={15}
+                        className="text-[#A47B3C]"
+                      />
+                    </div>
+
+                    {/* LUGAR */}
                     <p
                       className="
-                        itinerarioXV__descripcion-movil
-                        relative
-                        mt-3
-                        font-playfair
-                        text-sm
-                        leading-6
-                        text-[#2E2E2E]/65
+                        relative text-[19px]
+                        font-semibold leading-snug
+                        text-[#29251F]
+                        sm:text-[22px]
                       "
+                      style={{
+                        fontFamily:
+                          "'Cormorant Garamond', serif",
+                      }}
+                    >
+                      {evento.lugar}
+                    </p>
+
+                    {/* DESCRIPCIÓN */}
+                    <p
+                      className="
+                        relative mt-3 text-[17px]
+                        leading-relaxed text-[#50473D]
+                        sm:text-[19px]
+                      "
+                      style={{
+                        fontFamily:
+                          "'Cormorant Garamond', serif",
+                      }}
                     >
                       {evento.descripcion}
                     </p>
-                  </motion.div>
-
-                  {/* ESPACIO VACÍO EN ESCRITORIO */}
-                  <div
-                    className={`
-                      itinerarioXV__espacio
-                      hidden
-                      md:block
-                      ${
-                        esIzquierda
-                          ? "md:col-start-3"
-                          : "md:col-start-1"
-                      }
-                    `}
-                  />
+                  </motion.article>
                 </motion.div>
               );
             })}
@@ -643,42 +345,27 @@ const Itinerario = () => {
 
         {/* MENSAJE FINAL */}
         <motion.div
-          className="
-            itinerarioXV__mensaje-final
-            mx-auto
-            mt-16
-            max-w-2xl
-            text-center
-          "
-          initial={{
-            opacity: 0,
-            y: 25,
-          }}
-          whileInView={{
-            opacity: 1,
-            y: 0,
-          }}
-          transition={{
-            duration: 0.8,
-          }}
-          viewport={{
-            once: true,
-          }}
+          className="mt-16 text-center"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
         >
           <Sparkles
             size={24}
             strokeWidth={1.3}
-            className="mx-auto text-[#5D4E8C]"
+            className="mx-auto text-[#A47B3C]"
           />
 
           <p
             className="
-              mt-5
-              font-cursiveDancing
-              text-4xl
-              text-[#5D4E8C]
-              sm:text-5xl
+              mt-5 text-[40px]
+              leading-tight text-[#A47B3C]
+              sm:text-[52px]
             "
+            style={{
+              fontFamily: "'Allura', cursive",
+            }}
           >
             ¡Disfrutemos juntos cada momento!
           </p>
@@ -686,6 +373,4 @@ const Itinerario = () => {
       </div>
     </section>
   );
-};
-
-export default Itinerario;
+}

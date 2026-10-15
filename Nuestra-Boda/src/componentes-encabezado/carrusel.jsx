@@ -1,47 +1,133 @@
-import React, { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+
+import React, {
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+
+import { motion } from "framer-motion";
+
 import {
-  FaChevronLeft,
-  FaChevronRight,
-} from "react-icons/fa";
-import { Camera, Sparkles } from "lucide-react";
+  ChevronLeft,
+  ChevronRight,
+  Camera,
+  Sparkles,
+  Heart,
+} from "lucide-react";
 
-const Carousel = () => {
-  const images = [
-    {
-      src: "/carrusel01.png",
-      alt: "Fotografía especial 1",
-      position: "center",
-    },
-    {
-      src: "/carrusel02.png",
-      alt: "Fotografía especial 2",
-      position: "center",
-    },
-    {
-      src: "/carrusel03.png",
-      alt: "Fotografía especial 3",
-      position: "center",
-    },
-    {
-      src: "/carrusel04.png",
-      alt: "Fotografía especial 4",
-      position: "center",
-    },
-  ];
+// FOTOGRAFÍAS
+const images = [
+  {
+    src: "/Carrusel01v.jpeg",
+    alt: "Fotografía especial 1 de Emily",
+    position: "center",
+  },
+  {
+    src: "/Carrusel02.jpeg",
+    alt: "Fotografía especial 2 de Emily",
+    position: "center",
+  },
+  {
+    src: "/Carrusel03.jpeg",
+    alt: "Fotografía especial 3 de Emily",
+    position: "center",
+  },
+  {
+    src: "/Carrusel04.jpeg",
+    alt: "Fotografía especial 4 de Emily",
+    position: "center",
+  },
+   {
+    src: "/Carrusel05.jpeg",
+    alt: "Fotografía especial 4 de Emily",
+    position: "center",
+  },
+   {
+    src: "/Carrusel06.jpeg",
+    alt: "Fotografía especial 4 de Emily",
+    position: "center",
+  },
+];
 
+export default function Carousel() {
   const [index, setIndex] = useState(0);
   const [pausado, setPausado] = useState(false);
+  const [imagenesListas, setImagenesListas] =
+    useState(false);
 
+  const pausaTimeout = useRef(null);
+  const imagenesCargadas = useRef(new Set());
+
+  // PRECARGAR TODAS LAS FOTOGRAFÍAS
   useEffect(() => {
-    if (pausado) return undefined;
+    let activo = true;
 
-    const interval = setInterval(() => {
+    const precargar = images.map((imagen) => {
+      return new Promise((resolve) => {
+        const img = new Image();
+
+        img.onload = () => {
+          if (activo) {
+            imagenesCargadas.current.add(imagen.src);
+          }
+          resolve();
+        };
+
+        img.onerror = () => {
+          resolve();
+        };
+
+        img.src = imagen.src;
+
+        if (img.complete) {
+          resolve();
+        }
+      });
+    });
+
+    Promise.all(precargar).then(() => {
+      if (activo) {
+        setImagenesListas(true);
+      }
+    });
+
+    return () => {
+      activo = false;
+    };
+  }, []);
+
+  // CAMBIO AUTOMÁTICO
+  useEffect(() => {
+    if (pausado || !imagenesListas) return;
+
+    const intervalo = setInterval(() => {
       setIndex((prev) => (prev + 1) % images.length);
     }, 4500);
 
-    return () => clearInterval(interval);
-  }, [images.length, pausado]);
+    return () => clearInterval(intervalo);
+  }, [pausado, imagenesListas]);
+
+  // LIMPIAR TEMPORIZADOR
+  useEffect(() => {
+    return () => {
+      if (pausaTimeout.current) {
+        clearTimeout(pausaTimeout.current);
+      }
+    };
+  }, []);
+
+  // PAUSA TEMPORAL DESPUÉS DE INTERACTUAR
+  const pausarTemporalmente = () => {
+    setPausado(true);
+
+    if (pausaTimeout.current) {
+      clearTimeout(pausaTimeout.current);
+    }
+
+    pausaTimeout.current = setTimeout(() => {
+      setPausado(false);
+    }, 7000);
+  };
 
   const nextImage = () => {
     setIndex((prev) => (prev + 1) % images.length);
@@ -50,7 +136,8 @@ const Carousel = () => {
 
   const prevImage = () => {
     setIndex(
-      (prev) => (prev - 1 + images.length) % images.length
+      (prev) =>
+        (prev - 1 + images.length) % images.length
     );
     pausarTemporalmente();
   };
@@ -60,621 +147,466 @@ const Carousel = () => {
     pausarTemporalmente();
   };
 
-  const pausarTemporalmente = () => {
-    setPausado(true);
-
-    window.clearTimeout(
-      window.__carouselXVTimeout
-    );
-
-    window.__carouselXVTimeout = window.setTimeout(() => {
-      setPausado(false);
-    }, 7000);
-  };
-
-  const imagenActual = images[index];
-
   return (
     <section
+      id="carousel"
       className="
         carouselXV
-        relative
-        isolate
-        w-full
-        overflow-hidden
-        bg-gradient-to-b
-        from-[#E8DFF2]
-        via-[#FFFFFF]
-        to-[#F5EBDD]
-        px-4
-        py-20
-        sm:px-6
-        sm:py-28
+        relative isolate
+        w-full overflow-hidden
+        bg-[#EDE0CC]
+        px-4 py-20
+        sm:px-8 sm:py-28
       "
     >
-      {/* LUCES DE FONDO */}
+      {/* MARCOS DECORATIVOS */}
       <div
         className="
-          carouselXV__luz-superior
           pointer-events-none
-          absolute
-          -left-28
-          -top-32
-          h-[400px]
-          w-[400px]
-          rounded-full
-          bg-[#C8B6E2]/45
-          blur-[110px]
+          absolute inset-3
+          border border-[#B99558]/35
+          sm:inset-6
         "
       />
 
       <div
         className="
-          carouselXV__luz-inferior
           pointer-events-none
-          absolute
-          -bottom-32
-          -right-24
-          h-[420px]
-          w-[420px]
-          rounded-full
-          bg-[#5D4E8C]/20
-          blur-[120px]
+          absolute inset-[18px]
+          border border-[#B99558]/20
+          sm:inset-[30px]
         "
       />
 
       {/* DESTELLOS */}
       <motion.div
         className="
-          carouselXV__destello-izquierdo
           pointer-events-none
-          absolute
-          left-[7%]
-          top-24
-          text-[#5D4E8C]/40
+          absolute left-[7%] top-16
+          text-[#B58A49]
         "
         animate={{
-          opacity: [0.25, 1, 0.25],
-          scale: [0.8, 1.2, 0.8],
-          rotate: [0, 20, 0],
-        }}
-        transition={{
-          duration: 3.4,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      >
-        <Sparkles size={30} strokeWidth={1.2} />
-      </motion.div>
-
-      <motion.div
-        className="
-          carouselXV__destello-derecho
-          pointer-events-none
-          absolute
-          right-[8%]
-          top-1/3
-          text-[#C8B6E2]
-        "
-        animate={{
-          opacity: [0.2, 0.9, 0.2],
-          scale: [0.7, 1.15, 0.7],
-          rotate: [0, -20, 0],
+          opacity: [0.3, 1, 0.3],
+          scale: [0.85, 1.15, 0.85],
         }}
         transition={{
           duration: 4,
           repeat: Infinity,
-          ease: "easeInOut",
-          delay: 0.5,
         }}
       >
-        <Sparkles size={38} strokeWidth={1.1} />
+        <Sparkles size={29} strokeWidth={1.2} />
       </motion.div>
 
       <motion.div
         className="
-          carouselXV__contenedor
-          relative
-          z-10
-          mx-auto
-          max-w-6xl
+          pointer-events-none
+          absolute right-[8%] top-36
+          text-[#B58A49]
         "
-        initial={{
-          opacity: 0,
-          y: 55,
-        }}
-        whileInView={{
-          opacity: 1,
-          y: 0,
+        animate={{
+          opacity: [0.25, 0.9, 0.25],
+          scale: [0.8, 1.1, 0.8],
         }}
         transition={{
-          duration: 0.9,
-          ease: [0.22, 1, 0.36, 1],
-        }}
-        viewport={{
-          once: true,
-          amount: 0.2,
+          duration: 4.5,
+          repeat: Infinity,
         }}
       >
+        <Sparkles size={32} strokeWidth={1.2} />
+      </motion.div>
+
+      <div className="relative z-10 mx-auto max-w-6xl">
+
         {/* ENCABEZADO */}
-        <div
-          className="
-            carouselXV__encabezado
-            mb-12
-            text-center
-          "
+        <motion.div
+          className="mb-12 text-center"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
         >
           <motion.div
             className="
-              carouselXV__icono
-              mx-auto
-              mb-5
-              flex
-              h-16
-              w-16
-              items-center
-              justify-center
+              mx-auto mb-6
+              flex h-20 w-20
+              items-center justify-center
               rounded-full
-              border
-              border-[#5D4E8C]/15
-              bg-white/75
-              text-[#5D4E8C]
-              shadow-[0_12px_30px_rgba(93,78,140,0.15)]
-              backdrop-blur-md
+              border border-[#C7A46A]
+              bg-[#F8F3EA]
+              text-[#A47B3C]
             "
             animate={{
               y: [0, -5, 0],
             }}
             transition={{
-              duration: 3.5,
+              duration: 4,
               repeat: Infinity,
-              ease: "easeInOut",
             }}
           >
-            <Camera size={29} strokeWidth={1.4} />
+            <Camera size={35} strokeWidth={1.2} />
           </motion.div>
 
           <p
             className="
-              carouselXV__etiqueta
-              font-playfair
-              text-xs
-              font-semibold
-              uppercase
-              tracking-[0.38em]
-              text-[#5D4E8C]/65
+              text-xs uppercase
+              tracking-[0.3em]
+              text-[#86683D]
               sm:text-sm
             "
+            style={{
+              fontFamily: "'Playfair Display', serif",
+            }}
           >
             Recuerdos especiales
           </p>
 
           <h2
             className="
-              carouselXV__titulo
-              mt-4
-              font-cursiveDancing
-              text-5xl
-              leading-none
-              text-[#5D4E8C]
-              sm:text-6xl
-              md:text-7xl
+              mt-4 text-[65px]
+              leading-tight
+              text-[#A47B3C]
+              sm:text-[85px]
             "
+            style={{
+              fontFamily: "'Great Vibes', cursive",
+            }}
           >
             Mis Momentos
           </h2>
 
           <div
             className="
-              carouselXV__separador
-              mx-auto
-              mt-7
-              flex
-              items-center
-              justify-center
-              gap-3
+              mx-auto my-6
+              flex items-center
+              justify-center gap-3
             "
           >
-            <span
-              className="
-                h-px
-                w-16
-                bg-gradient-to-r
-                from-transparent
-                to-[#5D4E8C]/45
-                sm:w-24
-              "
+            <span className="h-px w-16 bg-[#B99558]" />
+
+            <Heart
+              size={17}
+              fill="#B99558"
+              className="text-[#B99558]"
             />
 
-            <Sparkles
-              size={18}
-              strokeWidth={1.3}
-              className="text-[#5D4E8C]"
-            />
-
-            <span
-              className="
-                h-px
-                w-16
-                bg-gradient-to-l
-                from-transparent
-                to-[#5D4E8C]/45
-                sm:w-24
-              "
-            />
+            <span className="h-px w-16 bg-[#B99558]" />
           </div>
 
           <p
             className="
-              carouselXV__descripcion
-              mx-auto
-              mt-6
-              max-w-2xl
-              font-playfair
-              text-base
+              mx-auto max-w-xl
+              text-[21px]
               leading-relaxed
-              text-[#2E2E2E]/65
-              sm:text-lg
+              text-[#29251F]
+              sm:text-[25px]
             "
+            style={{
+              fontFamily:
+                "'Cormorant Garamond', serif",
+            }}
           >
-            Cada fotografía guarda un instante especial de
-            esta hermosa etapa de mi vida.
+            Cada fotografía guarda un instante
+            especial de esta hermosa etapa de mi vida.
           </p>
-        </div>
+        </motion.div>
 
         {/* TARJETA PRINCIPAL */}
-        <div
+        <motion.div
           className="
-            carouselXV__tarjeta
-            relative
-            mx-auto
-            max-w-5xl
-            overflow-hidden
-            rounded-[2rem]
-            border
-            border-white/80
-            bg-white/70
+            mx-auto max-w-5xl
+            border border-[#C7A46A]
+            bg-[#F8F3EA]
             p-3
-            shadow-[0_30px_90px_rgba(93,78,140,0.2)]
-            backdrop-blur-xl
-            sm:rounded-[2.8rem]
+            shadow-[0_20px_60px_rgba(100,75,35,0.12)]
             sm:p-5
           "
+          initial={{
+            opacity: 0,
+            y: 35,
+          }}
+          whileInView={{
+            opacity: 1,
+            y: 0,
+          }}
+          viewport={{
+            once: true,
+            amount: 0.15,
+          }}
+          transition={{
+            duration: 0.8,
+          }}
         >
-          {/* VISOR */}
+          {/* VISOR DE IMÁGENES */}
           <div
             className="
-              carouselXV__visor
-              relative
-              h-[520px]
-              w-full
+              relative w-full
+              h-[430px]
               overflow-hidden
-              rounded-[1.5rem]
-              bg-[#DDD4E8]
-              sm:h-[650px]
-              sm:rounded-[2.2rem]
-              md:h-[720px]
+              bg-[#E5D8C4]
+              sm:h-[570px]
+              md:h-[680px]
+              lg:h-[720px]
             "
             onMouseEnter={() => setPausado(true)}
             onMouseLeave={() => setPausado(false)}
           >
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={index}
+            {/* TODAS LAS IMÁGENES PERMANECEN MONTADAS */}
+            {images.map((imagen, i) => (
+              <div
+                key={imagen.src}
                 className="
-                  carouselXV__imagen-contenedor
-                  absolute
-                  inset-0
+                  absolute inset-0
+                  transition-opacity
+                  duration-700
+                  ease-in-out
                 "
-                initial={{
-                  opacity: 0,
-                  scale: 1.03,
+                style={{
+                  opacity: index === i ? 1 : 0,
+                  zIndex: index === i ? 2 : 1,
+                  pointerEvents:
+                    index === i ? "auto" : "none",
                 }}
-                animate={{
-                  opacity: 1,
-                  scale: 1,
-                }}
-                exit={{
-                  opacity: 0,
-                  scale: 0.98,
-                }}
-                transition={{
-                  duration: 0.75,
-                  ease: [0.22, 1, 0.36, 1],
-                }}
+                aria-hidden={index !== i}
               >
-                {/* FONDO DESENFOCADO */}
+                {/* FONDO SUAVE */}
                 <img
-                  src={imagenActual.src}
+                  src={imagen.src}
                   alt=""
                   aria-hidden="true"
+                  loading="eager"
+                  decoding="async"
                   className="
-                    carouselXV__imagen-fondo
-                    absolute
-                    inset-0
-                    h-full
-                    w-full
+                    absolute inset-0
+                    h-full w-full
                     scale-110
                     object-cover
-                    opacity-45
+                    opacity-25
                     blur-2xl
                   "
                   style={{
-                    objectPosition: imagenActual.position,
+                    objectPosition: imagen.position,
                   }}
                 />
 
-                {/* OVERLAY DEL FONDO */}
-                <div
+                {/* FOTOGRAFÍA COMPLETA */}
+                <img
+                  src={imagen.src}
+                  alt={imagen.alt}
+                  loading="eager"
+                  decoding="async"
                   className="
-                    carouselXV__imagen-overlay
-                    absolute
-                    inset-0
-                    bg-gradient-to-b
-                    from-[#5D4E8C]/15
-                    via-black/5
-                    to-[#2E2E2E]/25
-                  "
-                />
-
-                {/* IMAGEN COMPLETA */}
-                <motion.img
-                  src={imagenActual.src}
-                  alt={imagenActual.alt}
-                  className="
-                    carouselXV__imagen-principal
-                    relative
-                    z-10
-                    h-full
-                    w-full
+                    relative z-10
+                    h-full w-full
                     object-contain
                   "
                   style={{
-                    objectPosition: imagenActual.position,
+                    objectPosition: imagen.position,
                   }}
-                  initial={{
-                    scale: 1.025,
-                  }}
-                  animate={{
-                    scale: 1,
-                  }}
-                  transition={{
-                    duration: 4.5,
-                    ease: "easeOut",
-                  }}
+                  draggable={false}
                 />
-              </motion.div>
-            </AnimatePresence>
+              </div>
+            ))}
 
-            {/* SOMBRA SUPERIOR */}
+            {/* INDICADOR SUPERIOR */}
             <div
               className="
-                carouselXV__sombra-superior
-                pointer-events-none
-                absolute
-                inset-x-0
-                top-0
-                z-20
-                h-28
-                bg-gradient-to-b
-                from-black/30
-                to-transparent
+                absolute right-4 top-4 z-20
+                border border-[#C7A46A]
+                bg-[#FFFDF9]/95
+                px-4 py-2
+                text-sm tracking-[0.15em]
+                text-[#29251F]
+                shadow-md
               "
-            />
-
-            {/* SOMBRA INFERIOR */}
-            <div
-              className="
-                carouselXV__sombra-inferior
-                pointer-events-none
-                absolute
-                inset-x-0
-                bottom-0
-                z-20
-                h-32
-                bg-gradient-to-t
-                from-black/45
-                to-transparent
-              "
-            />
-
-            {/* CONTADOR */}
-            <div
-              className="
-                carouselXV__contador
-                absolute
-                right-4
-                top-4
-                z-30
-                rounded-full
-                border
-                border-white/30
-                bg-[#2E2E2E]/35
-                px-4
-                py-2
-                font-playfair
-                text-sm
-                tracking-[0.15em]
-                text-white
-                shadow-lg
-                backdrop-blur-md
-                sm:right-6
-                sm:top-6
-              "
+              style={{
+                fontFamily:
+                  "'Playfair Display', serif",
+              }}
             >
               {String(index + 1).padStart(2, "0")}
-              <span className="mx-2 text-white/50">/</span>
+              <span className="mx-2 text-[#A47B3C]">
+                /
+              </span>
               {String(images.length).padStart(2, "0")}
             </div>
 
-            {/* BOTÓN IZQUIERDO */}
+            {/* CARGA INICIAL */}
+            {!imagenesListas && (
+              <div
+                className="
+                  absolute inset-0 z-30
+                  flex items-center justify-center
+                  bg-[#E5D8C4]
+                "
+              >
+                <div className="text-center">
+                  <motion.div
+                    animate={{
+                      rotate: 360,
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: "linear",
+                    }}
+                  >
+                    <Sparkles
+                      size={34}
+                      className="
+                        mx-auto text-[#A47B3C]
+                      "
+                    />
+                  </motion.div>
+
+                  <p
+                    className="
+                      mt-4 text-sm
+                      text-[#6D5534]
+                    "
+                    style={{
+                      fontFamily:
+                        "'Playfair Display', serif",
+                    }}
+                  >
+                    Preparando recuerdos...
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* CONTROLES DEBAJO DE LA IMAGEN */}
+          <div
+            className="
+              mt-6 flex
+              items-center justify-center
+              gap-5
+              sm:gap-8
+            "
+          >
+            {/* ANTERIOR */}
             <motion.button
               type="button"
               onClick={prevImage}
-              aria-label="Ver fotografía anterior"
+              disabled={!imagenesListas}
+              aria-label="Fotografía anterior"
               className="
-                carouselXV__boton-anterior
-                absolute
-                left-3
-                top-1/2
-                z-30
-                flex
-                h-11
-                w-11
-                -translate-y-1/2
-                items-center
-                justify-center
+                flex h-12 w-12
+                items-center justify-center
                 rounded-full
-                border
-                border-white/35
-                bg-[#5D4E8C]/85
+                border border-[#C7A46A]
+                bg-[#A47B3C]
                 text-white
-                shadow-[0_10px_30px_rgba(46,46,46,0.25)]
-                backdrop-blur-md
-                transition
-                duration-300
-                hover:bg-[#4B3E76]
-                sm:left-6
-                sm:h-13
-                sm:w-13
+                shadow-md
+                transition-colors
+                hover:bg-[#87612D]
+                disabled:opacity-50
+                sm:h-14 sm:w-14
               "
-              whileHover={{
-                scale: 1.1,
-              }}
-              whileTap={{
-                scale: 0.92,
-              }}
+              whileHover={{ scale: 1.08 }}
+              whileTap={{ scale: 0.94 }}
             >
-              <FaChevronLeft size={18} />
+              <ChevronLeft size={24} strokeWidth={1.7} />
             </motion.button>
 
-            {/* BOTÓN DERECHO */}
-            <motion.button
-              type="button"
-              onClick={nextImage}
-              aria-label="Ver fotografía siguiente"
-              className="
-                carouselXV__boton-siguiente
-                absolute
-                right-3
-                top-1/2
-                z-30
-                flex
-                h-11
-                w-11
-                -translate-y-1/2
-                items-center
-                justify-center
-                rounded-full
-                border
-                border-white/35
-                bg-[#5D4E8C]/85
-                text-white
-                shadow-[0_10px_30px_rgba(46,46,46,0.25)]
-                backdrop-blur-md
-                transition
-                duration-300
-                hover:bg-[#4B3E76]
-                sm:right-6
-                sm:h-13
-                sm:w-13
-              "
-              whileHover={{
-                scale: 1.1,
-              }}
-              whileTap={{
-                scale: 0.92,
-              }}
-            >
-              <FaChevronRight size={18} />
-            </motion.button>
-
-            {/* INDICADORES INFERIORES */}
+            {/* INDICADORES */}
             <div
               className="
-                carouselXV__indicadores
-                absolute
-                bottom-5
-                left-1/2
-                z-30
-                flex
-                -translate-x-1/2
-                items-center
-                gap-2
+                flex items-center
+                justify-center gap-2
               "
             >
               {images.map((imagen, i) => (
                 <button
                   key={imagen.src}
                   type="button"
+                  disabled={!imagenesListas}
                   onClick={() => seleccionarImagen(i)}
                   aria-label={`Ver fotografía ${i + 1}`}
-                  className="flex items-center justify-center"
+                  aria-current={index === i ? "true" : undefined}
+                  className="
+                    flex h-9
+                    items-center justify-center
+                    disabled:opacity-50
+                  "
                 >
-                  <motion.span
-                    animate={{
-                      width: index === i ? 34 : 9,
-                      opacity: index === i ? 1 : 0.6,
-                    }}
-                    transition={{
-                      duration: 0.3,
-                    }}
-                    className="
-                      block
-                      h-2
+                  <span
+                    className={`
+                      block h-2
                       rounded-full
-                      bg-white
-                      shadow
-                    "
+                      transition-all
+                      duration-300
+                      ${
+                        index === i
+                          ? "w-8 bg-[#A47B3C]"
+                          : "w-2 bg-[#C7A46A]/60"
+                      }
+                    `}
                   />
                 </button>
               ))}
             </div>
+
+            {/* SIGUIENTE */}
+            <motion.button
+              type="button"
+              onClick={nextImage}
+              disabled={!imagenesListas}
+              aria-label="Fotografía siguiente"
+              className="
+                flex h-12 w-12
+                items-center justify-center
+                rounded-full
+                border border-[#C7A46A]
+                bg-[#A47B3C]
+                text-white
+                shadow-md
+                transition-colors
+                hover:bg-[#87612D]
+                disabled:opacity-50
+                sm:h-14 sm:w-14
+              "
+              whileHover={{ scale: 1.08 }}
+              whileTap={{ scale: 0.94 }}
+            >
+              <ChevronRight size={24} strokeWidth={1.7} />
+            </motion.button>
           </div>
 
           {/* MINIATURAS */}
           <div
             className="
-              carouselXV__miniaturas
-              mt-4
-              flex
+              mt-6 flex
+              items-center justify-center
               gap-3
               overflow-x-auto
-              px-1
-              pb-2
-              pt-1
-              sm:mt-5
-              sm:justify-center
+              px-2 pb-3
             "
           >
             {images.map((imagen, i) => (
               <motion.button
                 key={imagen.src}
                 type="button"
+                disabled={!imagenesListas}
                 onClick={() => seleccionarImagen(i)}
                 aria-label={`Seleccionar fotografía ${i + 1}`}
                 className={`
-                  carouselXV__miniatura
-                  relative
-                  h-20
-                  min-w-[64px]
+                  relative h-16 w-14
+                  flex-shrink-0
                   overflow-hidden
-                  rounded-2xl
                   border-2
-                  bg-[#E8DFF2]
-                  shadow-md
-                  transition
+                  shadow-sm
+                  transition-all
                   duration-300
-                  sm:h-24
-                  sm:min-w-[76px]
+                  sm:h-20 sm:w-16
                   ${
                     index === i
-                      ? "border-[#5D4E8C] opacity-100"
-                      : "border-white opacity-60 hover:opacity-100"
+                      ? "border-[#A47B3C] opacity-100"
+                      : "border-[#D7C4A4] opacity-60"
                   }
                 `}
                 whileHover={{
-                  y: -4,
+                  y: -3,
                 }}
                 whileTap={{
                   scale: 0.96,
@@ -683,56 +615,42 @@ const Carousel = () => {
                 <img
                   src={imagen.src}
                   alt=""
+                  loading="eager"
                   className="
-                    carouselXV__miniatura-imagen
-                    h-full
-                    w-full
+                    h-full w-full
                     object-cover
                   "
                   style={{
                     objectPosition: imagen.position,
                   }}
                 />
-
-                {index === i && (
-                  <motion.div
-                    layoutId="miniaturaActiva"
-                    className="
-                      carouselXV__miniatura-activa
-                      absolute
-                      inset-0
-                      bg-[#5D4E8C]/10
-                    "
-                  />
-                )}
-
-                <span
-                  className="
-                    carouselXV__miniatura-numero
-                    absolute
-                    bottom-1
-                    right-1
-                    flex
-                    h-5
-                    w-5
-                    items-center
-                    justify-center
-                    rounded-full
-                    bg-[#5D4E8C]/85
-                    text-[10px]
-                    text-white
-                    backdrop-blur-sm
-                  "
-                >
-                  {i + 1}
-                </span>
               </motion.button>
             ))}
           </div>
-        </div>
-      </motion.div>
+        </motion.div>
+
+        {/* FRASE FINAL */}
+        <motion.div
+          className="mt-12 text-center"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+        >
+          <p
+            className="
+              text-[40px] leading-tight
+              text-[#A47B3C]
+              sm:text-[52px]
+            "
+            style={{
+              fontFamily: "'Allura', cursive",
+            }}
+          >
+            Recuerdos que vivirán por siempre
+          </p>
+        </motion.div>
+      </div>
     </section>
   );
-};
-
-export default Carousel;
+}
