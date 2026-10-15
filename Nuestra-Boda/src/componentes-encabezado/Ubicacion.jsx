@@ -17,7 +17,7 @@ const ubicaciones = [
   {
     id: "ceremonia",
     tipo: "Ceremonia religiosa",
-    lugar: "Parroquia de San Pedro Cholula",
+    lugar: "Parroquia de San Pedro Apóstol",
     hora: "5:00 PM",
     direccion:
       "Av. 5 de Mayo & Avenida 4 Poniente, Av. 5 de Mayo, Centro, 72760 San Pedro Cholula, Pue.",
