@@ -26,7 +26,7 @@ export default function Portada() {
         {/* IMAGEN VERTICAL - CELULAR */}
         <img
 
-          src="/Portada.png"
+          src="/PortadaC.png"
           alt="Emily - Mis XV Años - 19 de diciembre de 2026"
           className="
             block
