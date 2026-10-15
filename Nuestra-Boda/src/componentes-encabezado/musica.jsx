@@ -270,20 +270,6 @@ export default function MusicaXV() {
                 <span className="h-px w-14 bg-[#C7A46A]/60" />
               </div>
 
-              {/* FECHA */}
-              <p
-                className="
-                  relative mb-5
-                  text-[11px] uppercase
-                  tracking-[0.16em]
-                  text-[#7B6648]
-                "
-                style={{
-                  fontFamily: "'Cormorant Garamond', serif",
-                }}
-              >
-                19 de diciembre de 2026
-              </p>
 
               {/* DESCRIPCIÓN */}
               <p
