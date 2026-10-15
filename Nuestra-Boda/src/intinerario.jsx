@@ -7,6 +7,7 @@ import Regalos from "./componentes-encabezado/Regalos";
 import Confirmacion from "./componentes-encabezado/Confirmacion";
 import MusicaXV from "./componentes-encabezado/musica";
 import Itinerario from "./componentes-encabezado/itinerario";
+import PadresPadrinos from "./componentes-encabezado/PadresYPadrinos";
 
 export default function Intinerario() {
   return (
@@ -19,6 +20,8 @@ export default function Intinerario() {
       <Contador />
 
       <Celebracion />
+
+      <PadresPadrinos/>
 
       <Itinerario/>
 

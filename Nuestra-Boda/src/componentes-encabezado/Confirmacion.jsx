@@ -1,565 +1,416 @@
 
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Check,
-  Crown,
-  Heart,
-  Loader2,
-  MessageCircle,
-  Send,
-  Sparkles,
-  UserRound,
-  UsersRound,
   X,
+  Users,
+  Baby,
+  UserRound,
+  MessageSquareText,
+  Send,
+  LoaderCircle,
 } from "lucide-react";
 
-// PEGA AQUÍ LA URL DE TU NUEVA IMPLEMENTACIÓN
-// DE GOOGLE APPS SCRIPT
+// Coloca aquí la URL /exec de tu Apps Script.
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxHdbXgU981k2d-oM6EuMv7SnotNX5rIIYienLWEa611iKcqsfZGCg-w6nFPzfvXx1r7Q/exec";
+
+const colores = {
+  fondo: "#FFFDF9",
+  beige: "#F8F3EA",
+  dorado: "#A47B3C",
+  borde: "#C7A46A",
+  texto: "#29251F",
+};
+
+const esEnteroValido = (valor) =>
+  /^\d+$/.test(String(valor).trim()) &&
+  Number.isSafeInteger(Number(valor));
 
 export default function Confirmacion() {
   const [nombre, setNombre] = useState("");
   const [asistencia, setAsistencia] = useState("");
-  const [invitados, setInvitados] = useState("");
+  const [adultos, setAdultos] = useState("");
+  const [ninos, setNinos] = useState("0");
   const [mensaje, setMensaje] = useState("");
-
+  const [error, setError] = useState("");
   const [enviando, setEnviando] = useState(false);
   const [enviado, setEnviado] = useState(false);
-  const [error, setError] = useState("");
 
-  const bloqueoEnvio = useRef(false);
-
-  const cambiarAsistencia = (valor) => {
+  const seleccionarAsistencia = (valor) => {
     setAsistencia(valor);
     setError("");
     setEnviado(false);
 
-    if (valor === "No podré asistir") {
-      setInvitados("");
+    if (valor === "No asistiré") {
+      setAdultos("");
+      setNinos("0");
     }
   };
 
-  const enviarConfirmacion = async (event) => {
-    event.preventDefault();
+  const enviarConfirmacion = async (e) => {
+    e.preventDefault();
+    if (enviando || enviado) return;
 
-    if (bloqueoEnvio.current) return;
-
-    if (!nombre.trim() || !asistencia) {
-      setError(
-        "Escribe tu nombre y selecciona si podrás asistir."
-      );
+    if (!nombre.trim()) {
+      setError("Por favor, escribe tu nombre.");
       return;
+    }
+
+    if (!asistencia) {
+      setError("Selecciona si asistirás al evento.");
+      return;
+    }
+
+    let cantidadAdultos = 0;
+    let cantidadNinos = 0;
+
+    if (asistencia === "Sí asistiré") {
+      if (
+        !esEnteroValido(adultos) ||
+        !esEnteroValido(ninos)
+      ) {
+        setError(
+          "Escribe cantidades válidas de adultos y niños. Si no asistirán niños, coloca 0."
+        );
+        return;
+      }
+
+      cantidadAdultos = Number(adultos);
+      cantidadNinos = Number(ninos);
+
+      if (cantidadAdultos + cantidadNinos < 1) {
+        setError(
+          "Debe asistir al menos una persona."
+        );
+        return;
+      }
     }
 
     if (
-      asistencia === "Sí asistiré" &&
-      (
-        !invitados ||
-        !Number.isInteger(Number(invitados)) ||
-        Number(invitados) < 1
-      )
+      !SCRIPT_URL.startsWith("https://script.google.com/")
     ) {
-      setError("Indica un número válido de invitados.");
+      setError("Configura primero la URL de Apps Script.");
       return;
     }
 
-    if (!SCRIPT_URL.startsWith("https://script.google.com/")) {
-      setError(
-        "Falta configurar la conexión con Google Sheets."
-      );
-      return;
-    }
+    setError("");
+    setEnviando(true);
 
     const datos = {
+      tipo: "confirmacion",
       nombre: nombre.trim(),
       asistencia,
-      invitados:
-        asistencia === "Sí asistiré"
-          ? Number(invitados)
-          : 0,
+      adultos: cantidadAdultos,
+      ninos: cantidadNinos,
+      invitados: cantidadAdultos + cantidadNinos,
       mensaje: mensaje.trim(),
     };
 
-    bloqueoEnvio.current = true;
-    setEnviando(true);
-    setError("");
-    setEnviado(false);
-
     try {
-      const respuesta = await fetch(SCRIPT_URL, {
+      // Apps Script puede requerir no-cors para
+      // recibir solicitudes desde Vercel.
+      await fetch(SCRIPT_URL, {
         method: "POST",
+        mode: "no-cors",
         headers: {
           "Content-Type": "text/plain;charset=utf-8",
         },
         body: JSON.stringify(datos),
       });
 
-      if (!respuesta.ok) {
-        throw new Error("No fue posible conectar.");
-      }
-
-      const resultado = await respuesta.json();
-
-      if (!resultado.ok) {
-        throw new Error(
-          resultado.error || "No se pudo guardar."
-        );
-      }
-
+      // no-cors no permite comprobar si el
+      // servidor realmente guardó los datos.
       setEnviado(true);
-      setNombre("");
-      setAsistencia("");
-      setInvitados("");
-      setMensaje("");
     } catch (err) {
-      console.error("Error al confirmar:", err);
-
+      console.error(err);
       setError(
-        "No se pudo guardar tu confirmación. " +
-        "Verifica tu conexión e intenta nuevamente."
+        "No se pudo enviar la solicitud. Inténtalo de nuevo."
       );
     } finally {
-      bloqueoEnvio.current = false;
       setEnviando(false);
     }
   };
 
-  const inputClass = `
-    w-full border border-[#C7A46A]/60
-    bg-white px-4 py-4
-    text-[#29251F]
-    outline-none transition
-    placeholder:text-[#82776A]
-    focus:border-[#A47B3C]
-    focus:ring-2 focus:ring-[#C7A46A]/20
-    disabled:opacity-60
-  `;
+  const campoNumero = (titulo, icono, valor, cambiar) => (
+    <div className="min-w-0 flex-1">
+      <label className="mb-3 flex items-center justify-center gap-2 text-sm text-[#876A43]">
+        {icono}
+        {titulo}
+      </label>
+
+      <input
+        type="number"
+        inputMode="numeric"
+        min="0"
+        step="1"
+        value={valor}
+        onChange={(e) => {
+          cambiar(e.target.value);
+          setError("");
+        }}
+        placeholder="0"
+        className="w-full rounded-lg border border-[#D9C6A5] bg-white px-4 py-3 text-center text-xl text-[#29251F] outline-none transition focus:border-[#A47B3C] focus:ring-1 focus:ring-[#A47B3C]"
+      />
+    </div>
+  );
 
   return (
     <section
       id="confirmacion"
-      className="
-        relative isolate w-full overflow-hidden
-        bg-[#EDE0CC]
-        px-4 py-20 sm:px-8 sm:py-28
-      "
+      className="w-full bg-[#FFFDF9] px-4 py-20 sm:py-28"
     >
-      {/* MARCOS */}
-      <div className="
-        pointer-events-none absolute inset-3
-        border border-[#B99558]/35 sm:inset-6
-      " />
-
-      <div className="
-        pointer-events-none absolute inset-[18px]
-        border border-[#B99558]/20 sm:inset-[30px]
-      " />
-
-      {/* DESTELLOS */}
       <motion.div
-        className="
-          pointer-events-none absolute left-[7%]
-          top-16 text-[#A47B3C]
-        "
-        animate={{
-          opacity: [0.3, 1, 0.3],
-          scale: [0.85, 1.15, 0.85],
-        }}
-        transition={{
-          duration: 4,
-          repeat: Infinity,
-        }}
-      >
-        <Sparkles size={28} strokeWidth={1.2} />
-      </motion.div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 40 }}
+        initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.8 }}
-        className="
-          relative z-10 mx-auto max-w-4xl
-          border border-[#C7A46A]
-          bg-[#F8F3EA]
-          px-5 py-12
-          shadow-[0_20px_60px_rgba(100,75,35,0.12)]
-          sm:px-12 sm:py-16
-        "
+        className="mx-auto max-w-xl"
       >
-        <div className="
-          pointer-events-none absolute inset-[7px]
-          border border-[#C7A46A]/25
-        " />
-
-        <div className="relative z-10">
-          {/* CORONA */}
-          <motion.div
-            className="
-              mx-auto flex h-20 w-20
-              items-center justify-center
-              rounded-full border border-[#C7A46A]
-              bg-white text-[#A47B3C]
-            "
-            animate={{ y: [0, -5, 0] }}
-            transition={{
-              duration: 4,
-              repeat: Infinity,
-            }}
-          >
-            <Crown size={36} strokeWidth={1.2} />
-          </motion.div>
-
-          {/* ENCABEZADO */}
-          <div className="mt-7 text-center">
-            <p
-              className="
-                text-xs uppercase tracking-[0.3em]
-                text-[#86683D]
-              "
-              style={{
-                fontFamily: "'Playfair Display', serif",
-              }}
-            >
-              RSVP
+        <div className="border border-[#C7A46A] bg-[#F8F3EA] p-3 shadow-lg sm:p-4">
+          <div className="border border-[#D9C6A5] px-5 py-12 text-center sm:px-10 sm:py-16">
+            <p className="mb-4 text-xs uppercase tracking-[0.3em] text-[#A47B3C]">
+              ✦ Mis XV Años ✦
             </p>
 
             <h2
-              className="
-                mt-4 text-[clamp(3rem,8vw,5.3rem)]
-                leading-tight text-[#A47B3C]
-              "
+              className="text-5xl text-[#29251F] sm:text-6xl"
               style={{
                 fontFamily: "'Great Vibes', cursive",
               }}
             >
-              Confirma tu asistencia
+              Confirmación
             </h2>
 
-            <div className="
-              my-7 flex items-center justify-center gap-3
-            ">
-              <span className="h-px w-14 bg-[#C7A46A]" />
-              <Heart
-                size={17}
-                fill="#B99558"
-                className="text-[#B99558]"
-              />
-              <span className="h-px w-14 bg-[#C7A46A]" />
-            </div>
-
             <p
-              className="
-                mx-auto max-w-xl text-[21px]
-                leading-relaxed text-[#29251F]
-                sm:text-[25px]
-              "
+              className="mt-4 text-xl text-[#876A43]"
               style={{
-                fontFamily:
-                  "'Cormorant Garamond', serif",
+                fontFamily: "'Cormorant Garamond', serif",
               }}
             >
-              Tu presencia hará de mis XV años
-              un recuerdo todavía más especial.
-              Por favor, confirma si podrás acompañarme.
+              Tu presencia hará este día aún más especial.
             </p>
-          </div>
 
-          {/* FORMULARIO */}
-          <form
-            onSubmit={enviarConfirmacion}
-            className="mx-auto mt-10 max-w-xl space-y-7"
-          >
-            {/* NOMBRE */}
-            <div>
-              <label
-                htmlFor="nombre"
-                className="
-                  mb-2 block text-sm font-semibold
-                  text-[#72552C]
-                "
-              >
-                Nombre completo
-              </label>
+            <div className="mx-auto my-8 h-px w-20 bg-[#C7A46A]" />
 
-              <div className="relative">
-                <UserRound
-                  size={19}
-                  className="
-                    pointer-events-none absolute
-                    left-4 top-1/2
-                    -translate-y-1/2 text-[#A47B3C]
-                  "
-                />
-
-                <input
-                  id="nombre"
-                  type="text"
-                  required
-                  maxLength={100}
-                  autoComplete="name"
-                  placeholder="Nombre y apellido"
-                  value={nombre}
-                  onChange={(e) => {
-                    setNombre(e.target.value);
-                    setError("");
-                  }}
-                  disabled={enviando || enviado}
-                  className={`${inputClass} pl-12`}
-                />
-              </div>
-            </div>
-
-            {/* ASISTENCIA */}
-            <fieldset>
-              <legend
-                className="
-                  mb-3 text-sm font-semibold
-                  text-[#72552C]
-                "
-              >
-                ¿Podrás acompañarme?
-              </legend>
-
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                {[
-                  {
-                    valor: "Sí asistiré",
-                    Icono: Check,
-                  },
-                  {
-                    valor: "No podré asistir",
-                    Icono: X,
-                  },
-                ].map(({ valor, Icono }) => (
-                  <button
-                    key={valor}
-                    type="button"
-                    disabled={enviando || enviado}
-                    onClick={() => cambiarAsistencia(valor)}
-                    aria-pressed={asistencia === valor}
-                    className={`
-                      flex min-h-[65px]
-                      items-center justify-center gap-2
-                      border px-4 py-3
-                      font-medium transition
-                      disabled:opacity-60
-                      ${
-                        asistencia === valor
-                          ? "border-[#A47B3C] bg-[#A47B3C] text-white"
-                          : "border-[#C7A46A] bg-white text-[#72552C] hover:bg-[#F3E9D8]"
-                      }
-                    `}
-                  >
-                    <Icono size={20} />
-                    {valor}
-                  </button>
-                ))}
-              </div>
-            </fieldset>
-
-            {/* INVITADOS */}
-            <AnimatePresence>
-              {asistencia === "Sí asistiré" && (
+            <AnimatePresence mode="wait">
+              {enviado ? (
                 <motion.div
-                  initial={{
-                    opacity: 0,
-                    height: 0,
-                  }}
-                  animate={{
-                    opacity: 1,
-                    height: "auto",
-                  }}
-                  exit={{
-                    opacity: 0,
-                    height: 0,
-                  }}
-                  transition={{ duration: 0.3 }}
-                  className="overflow-hidden"
-                >
-                  <label
-                    htmlFor="invitados"
-                    className="
-                      mb-2 block text-sm font-semibold
-                      text-[#72552C]
-                    "
-                  >
-                    Número de invitados
-                  </label>
-
-                  <div className="relative">
-                    <UsersRound
-                      size={19}
-                      className="
-                        pointer-events-none absolute
-                        left-4 top-1/2
-                        -translate-y-1/2 text-[#A47B3C]
-                      "
-                    />
-
-                    <input
-                      id="invitados"
-                      type="number"
-                      min="1"
-                      step="1"
-                      required
-                      inputMode="numeric"
-                      placeholder="Ejemplo: 2"
-                      value={invitados}
-                      onChange={(e) => {
-                        setInvitados(e.target.value);
-                        setError("");
-                      }}
-                      disabled={enviando || enviado}
-                      className={`${inputClass} pl-12`}
-                    />
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* MENSAJE */}
-            <div>
-              <label
-                htmlFor="mensaje"
-                className="
-                  mb-2 block text-sm font-semibold
-                  text-[#72552C]
-                "
-              >
-                Mensaje para Emily (opcional)
-              </label>
-
-              <div className="relative">
-                <MessageCircle
-                  size={19}
-                  className="
-                    pointer-events-none absolute
-                    left-4 top-5 text-[#A47B3C]
-                  "
-                />
-
-                <textarea
-                  id="mensaje"
-                  rows={4}
-                  maxLength={1000}
-                  placeholder="Escribe un mensaje especial..."
-                  value={mensaje}
-                  onChange={(e) =>
-                    setMensaje(e.target.value)
-                  }
-                  disabled={enviando || enviado}
-                  className={`
-                    ${inputClass} resize-none pl-12
-                  `}
-                />
-              </div>
-            </div>
-
-            {/* ERROR */}
-            <AnimatePresence>
-              {error && (
-                <motion.div
-                  role="alert"
-                  initial={{ opacity: 0, y: -8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  className="
-                    border border-red-300
-                    bg-red-50 px-4 py-3
-                    text-sm text-red-800
-                  "
-                >
-                  {error}
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* ÉXITO */}
-            <AnimatePresence>
-              {enviado && (
-                <motion.div
-                  role="status"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="
-                    border border-[#C7A46A]
-                    bg-white px-5 py-5
-                    text-center text-[#72552C]
-                  "
+                  key="exito"
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="py-8"
                 >
                   <Check
-                    size={30}
-                    className="mx-auto mb-3"
+                    size={46}
+                    className="mx-auto mb-5 text-[#A47B3C]"
                   />
-                  <p className="font-semibold">
-                    ¡Confirmación registrada!
-                  </p>
-                  <p className="mt-2 text-sm">
-                    Gracias por responder.
+
+                  <h3
+                    className="text-3xl text-[#29251F]"
+                    style={{
+                      fontFamily:
+                        "'Cormorant Garamond', serif",
+                    }}
+                  >
+                    ¡Gracias por responder!
+                  </h3>
+
+                  <p className="mt-4 text-[#876A43]">
+                    Hemos enviado tu respuesta para su
+                    registro.
                   </p>
                 </motion.div>
+              ) : (
+                <motion.form
+                  key="formulario"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  onSubmit={enviarConfirmacion}
+                  className="space-y-7"
+                >
+                  {/* Nombre */}
+                  <div className="text-left">
+                    <label className="mb-2 flex items-center gap-2 text-sm text-[#876A43]">
+                      <UserRound size={17} />
+                      Nombre completo
+                    </label>
+
+                    <input
+                      type="text"
+                      value={nombre}
+                      onChange={(e) =>
+                        setNombre(e.target.value)
+                      }
+                      maxLength={120}
+                      placeholder="Escribe tu nombre"
+                      className="w-full rounded-lg border border-[#D9C6A5] bg-white px-4 py-3 text-[#29251F] outline-none focus:border-[#A47B3C]"
+                    />
+                  </div>
+
+                  {/* Asistencia */}
+                  <div>
+                    <p className="mb-4 text-sm text-[#876A43]">
+                      ¿Nos acompañarás?
+                    </p>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      {[
+                        {
+                          texto: "Sí asistiré",
+                          icono: <Check size={19} />,
+                        },
+                        {
+                          texto: "No asistiré",
+                          icono: <X size={19} />,
+                        },
+                      ].map((opcion) => {
+                        const activo =
+                          asistencia === opcion.texto;
+
+                        return (
+                          <button
+                            key={opcion.texto}
+                            type="button"
+                            onClick={() =>
+                              seleccionarAsistencia(
+                                opcion.texto
+                              )
+                            }
+                            className={`flex min-h-14 items-center justify-center gap-2 rounded-lg border px-2 py-3 text-sm transition ${
+                              activo
+                                ? "border-[#A47B3C] bg-[#A47B3C] text-white"
+                                : "border-[#D9C6A5] bg-white text-[#29251F]"
+                            }`}
+                          >
+                            {opcion.icono}
+                            {opcion.texto}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Adultos y niños */}
+                  <AnimatePresence>
+                    {asistencia === "Sí asistiré" && (
+                      <motion.div
+                        initial={{
+                          opacity: 0,
+                          height: 0,
+                        }}
+                        animate={{
+                          opacity: 1,
+                          height: "auto",
+                        }}
+                        exit={{
+                          opacity: 0,
+                          height: 0,
+                        }}
+                        className="overflow-hidden"
+                      >
+                        <div className="rounded-xl border border-[#D9C6A5] bg-[#FFFDF9] p-5">
+                          <p
+                            className="mb-5 text-2xl text-[#29251F]"
+                            style={{
+                              fontFamily:
+                                "'Cormorant Garamond', serif",
+                            }}
+                          >
+                            ¿Cuántas personas asistirán?
+                          </p>
+
+                          <div className="flex gap-4">
+                            {campoNumero(
+                              "Adultos",
+                              <Users size={17} />,
+                              adultos,
+                              setAdultos
+                            )}
+
+                            {campoNumero(
+                              "Niños",
+                              <Baby size={17} />,
+                              ninos,
+                              setNinos
+                            )}
+                          </div>
+
+                          <p className="mt-4 text-xs leading-relaxed text-[#876A43]">
+                            Escribe la cantidad de adultos
+                            y niños. Si no asistirán niños,
+                            deja el valor en 0.
+                          </p>
+
+                          <div className="mt-5 border-t border-[#D9C6A5] pt-4 text-sm text-[#876A43]">
+                            Total de asistentes:{" "}
+                            <strong className="text-[#A47B3C]">
+                              {(esEnteroValido(adultos)
+                                ? Number(adultos)
+                                : 0) +
+                                (esEnteroValido(ninos)
+                                  ? Number(ninos)
+                                  : 0)}
+                            </strong>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  {/* Mensaje */}
+                  <div className="text-left">
+                    <label className="mb-2 flex items-center gap-2 text-sm text-[#876A43]">
+                      <MessageSquareText size={17} />
+                      Mensaje para Emily (opcional)
+                    </label>
+
+                    <textarea
+                      value={mensaje}
+                      onChange={(e) =>
+                        setMensaje(e.target.value)
+                      }
+                      rows={3}
+                      maxLength={500}
+                      placeholder="Escribe un mensaje especial..."
+                      className="w-full resize-none rounded-lg border border-[#D9C6A5] bg-white px-4 py-3 text-[#29251F] outline-none focus:border-[#A47B3C]"
+                    />
+                  </div>
+
+                  {error && (
+                    <p
+                      role="alert"
+                      className="text-sm text-red-700"
+                    >
+                      {error}
+                    </p>
+                  )}
+
+                  <button
+                    type="submit"
+                    disabled={enviando}
+                    className="flex w-full items-center justify-center gap-3 rounded-lg bg-[#A47B3C] px-6 py-4 text-sm font-medium uppercase tracking-[0.12em] text-white transition hover:bg-[#87632F] disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {enviando ? (
+                      <>
+                        <LoaderCircle
+                          size={18}
+                          className="animate-spin"
+                        />
+                        Enviando...
+                      </>
+                    ) : (
+                      <>
+                        <Send size={18} />
+                        Enviar confirmación
+                      </>
+                    )}
+                  </button>
+                </motion.form>
               )}
             </AnimatePresence>
-
-            {/* ENVIAR */}
-            <motion.button
-              type="submit"
-              disabled={enviando || enviado}
-              whileHover={
-                enviando || enviado ? {} : { scale: 1.02 }
-              }
-              whileTap={
-                enviando || enviado ? {} : { scale: 0.98 }
-              }
-              className="
-                flex w-full items-center
-                justify-center gap-3
-                bg-[#A47B3C]
-                px-6 py-4
-                font-semibold uppercase
-                tracking-[0.1em] text-white
-                shadow-[0_12px_30px_rgba(100,75,35,0.2)]
-                transition hover:bg-[#87612D]
-                disabled:cursor-not-allowed
-                disabled:opacity-60
-              "
-            >
-              {enviando ? (
-                <>
-                  <Loader2
-                    size={20}
-                    className="animate-spin"
-                  />
-                  Enviando...
-                </>
-              ) : enviado ? (
-                <>
-                  <Check size={20} />
-                  Confirmación registrada
-                </>
-              ) : (
-                <>
-                  <Send size={20} />
-                  Enviar confirmación
-                </>
-              )}
-            </motion.button>
-          </form>
-
-          <p
-            className="
-              mt-9 text-center text-[37px]
-              text-[#A47B3C]
-              sm:text-[47px]
-            "
-            style={{
-              fontFamily: "'Allura', cursive",
-            }}
-          >
-            ¡Será una noche inolvidable!
-          </p>
+          </div>
         </div>
       </motion.div>
     </section>

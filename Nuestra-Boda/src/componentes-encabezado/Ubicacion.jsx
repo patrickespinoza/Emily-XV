@@ -30,7 +30,7 @@ const ubicaciones = [
     lugar: "Salón Zerezotla",
     hora: "7:00 PM",
     direccion:
-      "C. 15 Sur 1509, Barrio de Sta. María Xixitla, 72764 San Andrés Cholula, Pue.",
+      "C. 15 Sur 1509, Barrio de Sta. María Xixitla, 72764 San Pedro Cholula, Pue.",
     maps: "https://maps.app.goo.gl/74bubNFvaXBFAGdc9",
     icono: PartyPopper,
   },
